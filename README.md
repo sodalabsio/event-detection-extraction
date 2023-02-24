@@ -65,7 +65,7 @@ For example:
 - The news and event detection parts of the pipeline are cached once run (for a given `--query`, `--start-date` and `--end-date`) to avoid re-running them. To re-run the pipeline, delete the cache files in the `--output-path` directory
 - The pipeline can be subsequently run with different values for `--event-confidence` and `--top-k` to generate different event streamgraphs
 - All data and graphs are exported under the `--output-path` directory. The directory is automatically created during execution
-- To add/remove `trusted_news_sources`, edit [here](https://github.com/sodalabsio/event-detection-extraction/blob/844b153edee15059402d2c5d1ed7c82b770bebf4/run.py#L17)
+- To add/remove trusted news sources (as used when `--trusted-only=True`), edit [here](https://github.com/sodalabsio/event-detection-extraction/blob/844b153edee15059402d2c5d1ed7c82b770bebf4/run.py#L17)
 - Google News returns max 100 news items
 
 ## References
