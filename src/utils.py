@@ -1,7 +1,7 @@
 import os
 import datetime
-from dateutil.parser import parse
 from datetime import datetime
+from dateutil.parser import parse
 
 
 def create_folder(path):

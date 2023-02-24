@@ -21,7 +21,6 @@ def gaussian_smooth(x, y, grid, sd):
 
 def generate_vis(x, y, event_names, plot_title, save_path):
     """Generate the streamgraph visualization."""
-    # , subplot_kw=dict(facecolor='#EEEEEE'))
     fig, ax = plt.subplots(figsize=(10, 7))
     x_ = [int(str(z)[:5]) for z in x]
     grid = np.linspace(x_[0], x_[-1], num=300)

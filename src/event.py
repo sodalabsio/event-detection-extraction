@@ -6,20 +6,7 @@ from transformers import AutoTokenizer, AutoModelForQuestionAnswering, pipeline
 EVENT_Q = "What type of event happened?"  # trigger questions
 # source: https://huggingface.co/veronica320/QA-for-Event-Extraction
 MODEL_PATH = 'veronica320/QA-for-Event-Extraction'
-# additional argument questions
-ARG_Q = [
-    "What is causing the {}?",  # cause arg
-    "What is affected by the {}?",  # affected arg
-]
-Q_LABELS = ['cause', 'affected']
-
 EVENT_Q = "What type of event happened?"  # trigger questions
-# additional argument questions
-# ARG_Q = [
-#     "What is causing the {}?", # cause arg
-#     "What is affected by the {}?", # affected arg
-# ]
-# Q_LABELS = ['cause', 'affected']
 
 
 class QAEvent:
