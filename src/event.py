@@ -6,7 +6,6 @@ from transformers import AutoTokenizer, AutoModelForQuestionAnswering, pipeline
 EVENT_Q = "What type of event happened?"  # trigger questions
 # source: https://huggingface.co/veronica320/QA-for-Event-Extraction
 MODEL_PATH = 'veronica320/QA-for-Event-Extraction'
-EVENT_Q = "What type of event happened?"  # trigger questions
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 DEVICE_ID = 0 if torch.cuda.is_available() else -1
 
