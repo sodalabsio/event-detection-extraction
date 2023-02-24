@@ -18,17 +18,7 @@ TRUSTED_SOURCES = ['ABC News', 'The Guardian',
                    'Reuters', 'BBC', 'NPR', 'Amnesty International']
 
 if __name__ == '__main__':
-    """
-    python3 -m run  \
-    --query=Melbourne  \
-    --start-date=2023-01-15  \
-    --end-date=2023-01-31  \
-    --source=news  \
-    --output-path=./output  \
-    --event-confidence=0.5  \
-    --top-k=10
-    """
-    # example usage: python -m run --query --start_date --end_date --source --output-path --event-confidence --top-k
+    """Main function"""
     parser = argparse.ArgumentParser()
     parser.add_argument('--query', type=str, required=True,
                         help='Query to search for. Country or place full name, for example')
