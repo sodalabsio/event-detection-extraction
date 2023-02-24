@@ -31,18 +31,21 @@ if __name__ == '__main__':
     # example usage: python -m run --query --start_date --end_date --source --output-path --event-confidence --top-k
     parser = argparse.ArgumentParser()
     parser.add_argument('--query', type=str, required=True,
-                        help='Query to search for. Country or place full name, for example. Case-insensitive.')
+                        help='Query to search for. Country or place full name, for example')
     parser.add_argument('--start-date', type=str, required=True,
                         help='Start date of the event in YYYY-MM-DD format')
     parser.add_argument('--end-date', type=str, required=True,
                         help='End date of the event in YYYY-MM-DD format')
     parser.add_argument('--source', type=str, default='news', choices=['news', 'twitter'],
-                        required=True, help='Source of events to pull from such as news or twitter')
-    parser.add_argument('--output-path', type=str, help='Output directory to write the results', required=True)
-    parser.add_argument('--news-outlets', type=str, required=False,
-                        help='A list of trusted news sources to filter by (optional)', default=TRUSTED_SOURCES)
-    parser.add_argument('--event-confidence', type=float, help='A minimum confidence threshold for events', default=0.5)
-    parser.add_argument('--top-k', type=int, help='', required=False, default=10)
+                        required=True, help='Source of events to pull from such as news or twitter (only news is supported currently)')
+    parser.add_argument('--output-path', type=str,
+                        help='Output directory to write the results', required=True)
+    parser.add_argument('--trusted-only', type=lambda x: (str(x).lower() == 'true'), required=False,
+                        help='Whether to use trusted news sources to filter by (optional)', default=False)
+    parser.add_argument('--event-confidence', type=float,
+                        help='A minimum confidence threshold for events', default=0.5)
+    parser.add_argument(
+        '--top-k', type=int, help='The number of top events to surface based on frequency (should be less than 15)', required=False, default=10)
 
     args = parser.parse_args()
 
@@ -57,7 +60,7 @@ if __name__ == '__main__':
 
     # create the output dir (if it does not exist already)
     create_folder(args.output_path)
-    
+
     # parse date/times
     start_date = datetime.strptime(args.start_date, "%Y-%m-%d").date()
     end_date = datetime.strptime(args.end_date, "%Y-%m-%d").date()
@@ -72,12 +75,13 @@ if __name__ == '__main__':
     else:
         df = get_news(args.query, start_time, end_time)
         df.to_csv(news_path, index=False)
-    
-    print(f'Top {args.top_k} outlets (by volume):')
+
+    print(f'Top {args.top_k} outlets (by frequency):')
     print(df.media.value_counts()[:args.top_k])
 
     # 2. run event detection
-    print(f"==> Running event extraction with event confidence: {args.event_confidence} .. ")
+    print(
+        f"==> Running event extraction with event confidence: {args.event_confidence} .. ")
     if check_cache(path=events_path):
         df = pd.read_csv(events_path)
 
@@ -89,22 +93,32 @@ if __name__ == '__main__':
 
     # 3. filter events by confidence + outlets (if applicable)
     df['date'] = df.datetime
-    df['datetime'] = df.datetime.apply(lambda x: int(datetime.strptime(x, '%Y-%m-%d').strftime("%s")))
+    df['datetime'] = df.datetime.apply(lambda x: int(
+        datetime.strptime(x, '%Y-%m-%d').strftime("%s")))
     df['event'] = df.event.apply(str.lower)  # case normalize all event names
     # filter by confidence
     df_sub = df.loc[df.confidence >= args.event_confidence, :]
     
-    # 4. sort events based on their frequency (only retain top-k)
+    # 4. filter by trusted sources (if applicable)
+    if args.trusted_only == True:
+        print(f"==> Filtering by trusted sources: {', '.join(TRUSTED_SOURCES)} ..")
+        df_sub = df_sub.loc[df_sub.media.isin(TRUSTED_SOURCES), :]
+
+    # 5. sort events based on their frequency (only retain top-k)
     print(f"==> Top-{args.top_k} events:")
     top_events = df.event.groupby(df_sub.event).size().sort_values(
         ascending=False).head(args.top_k).to_dict()
     df_sub = df_sub.loc[df_sub.event.isin(
         top_events.keys()), :]  # filter by top-k events
     print(", ".join(list(top_events.keys())))
-    
-    # 5. create streamgraphs
+
+    # 6. create streamgraphs
     print(f"==> Generating streamgraph ..")
-    plot_title = f'Event Streamgraph for "{args.query}" from {args.start_date} to {args.end_date} (confidence >= {args.event_confidence})'
+    if args.trusted_only:
+        plot_title = f'Event Streamgraph for "{args.query}" from {args.start_date} to {args.end_date} (confidence >= {args.event_confidence}, trusted sources: {", ".join(TRUSTED_SOURCES)})'
+    else:
+        plot_title = f'Event Streamgraph for "{args.query}" from {args.start_date} to {args.end_date} (confidence >= {args.event_confidence})'
+    
     create_streamgraph(df_sub, plot_title, streamgraph_path)
 
     print(f"==> Execution completed.")

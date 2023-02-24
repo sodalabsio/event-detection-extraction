@@ -7,9 +7,9 @@ from scipy import stats
 import matplotlib.pyplot as plt
 
 # colors for the streamgraph
-COLOR_MAP = ['#d73027', '#fee090', '#e0f3f8', '#abd9e9', '#4575b4','#8dd3c7', 
-            '#bebada', '#d9d9d9', '#80b1d3', '#fdb462', '#b3de69', '#fccde5', 
-            '#fb8072', '#bc80bd', '#ccebc5']
+COLOR_MAP = ['#d73027', '#fee090', '#e0f3f8', '#abd9e9', '#4575b4', '#8dd3c7',
+             '#bebada', '#d9d9d9', '#80b1d3', '#fdb462', '#b3de69', '#fccde5',
+             '#fb8072', '#bc80bd', '#ccebc5']
 
 
 def gaussian_smooth(x, y, grid, sd):
@@ -33,32 +33,22 @@ def generate_vis(x, y, event_names, plot_title, save_path):
     date_labels = [datetime.datetime.fromtimestamp(
         int('{:<010d}'.format(int(float(d))))).strftime("%Y-%m-%d") for d in labels]
 
-    # set ticks values
-
-    # ax.set_xticks([int(float(label)) for label in labels])
-
     # set tick labels
     ax.xaxis.set_ticklabels(date_labels)
-    # ax.set_xticklabels(date_labels, rotation=90);
     ax.xaxis.set_ticks([float(label) for label in labels])
 
     ax.set_title(plot_title)
-    # ax.legend(title="Top 10 events", loc='upper left', prop={'size': 9});
     ax.legend(title="Top events", loc='upper left', prop={'size': 9})
 
     fig.tight_layout()
 
-    tooltips = []
     for i, s in enumerate(stream):
-        # label = f'<div class="tooltiptext">{[event_names[i]]}</div>'
-        # _labels = [f'{event_names[i]}: {k}' for k in date_labels]
         tooltip = mpld3.plugins.PointHTMLTooltip(s, labels=[event_names[i]],
                                                  hoffset=10, voffset=10,
                                                  css='.mpld3-tooltip{background-color: #fffff; padding: 8px}'
                                                  )
         mpld3.plugins.connect(fig, tooltip)
 
-    # mpld3.enable_notebook()
     mpld3.save_html(fig, save_path)
     mpld3.display()
 

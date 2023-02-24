@@ -53,10 +53,11 @@ def to_datetime(date_str, year):
     """
     # check if for example, if `date_str` has Sept instead of Sept and apply fix accordingly
     comps = date_str.split()
-    comps[1] = comps[1][:3] # NB: assuming month always comes in second position
+    # NB: assuming month always comes in second position
+    comps[1] = comps[1][:3]
     date_str = ' '.join(comps)
     try:
         return datetime.strptime(f'{date_str} {year}', '%d %b %Y').strftime('%Y-%m-%d')
-        
+
     except Exception as e:
         return datetime.strptime(f'{date_str}', '%d %b %Y').strftime('%Y-%m-%d')
